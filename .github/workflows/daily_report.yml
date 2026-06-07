@@ -1,0 +1,39 @@
+name: Daily Emotion Report
+
+on:
+  schedule:
+    - cron: "30 9 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  run-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r github_daily_report/requirements.txt
+
+      - name: Run daily report
+        env:
+          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+          QQ_SMTP_USER: ${{ secrets.QQ_SMTP_USER }}
+          QQ_SMTP_PASS: ${{ secrets.QQ_SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_CC: ${{ secrets.MAIL_CC }}
+          RECENT_DAYS: "5"
+          SEND_EMAIL: "1"
+        run: python github_daily_report/run_daily_report.py
+
+      - name: Upload latest CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-emotion-report
+          path: github_daily_report/daily_report_latest.csv
