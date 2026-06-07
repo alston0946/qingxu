@@ -1,4 +1,4 @@
-name: Daily Emotion Report
+name: Daily Emotion Report Auto
 
 on:
   schedule:
